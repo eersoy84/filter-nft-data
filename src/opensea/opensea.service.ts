@@ -5,7 +5,7 @@ import { models } from '@worldwidewebb/tsoa-shared';
 import { CollectionToken } from '../models/collectionTokens';
 
 @Injectable()
-export class OpenseaService implements OnModuleInit {
+export class OpenseaService {
   private openseaClient: any;
   private readonly logger = new Logger(OpenseaService.name);
 
@@ -14,12 +14,6 @@ export class OpenseaService implements OnModuleInit {
       baseURL: process.env.OPENSEA_API_URL,
       timeout: 5000,
     });
-  }
-  onModuleInit() {
-    this.initializeOpensea();
-  }
-
-  initializeOpensea() {
     this.logger.verbose('Initializing Opensea...');
     axiosRetry(this.openseaClient, { retries: 3, retryDelay: () => 500 });
   }

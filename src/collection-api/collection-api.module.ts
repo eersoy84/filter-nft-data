@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CollectionApi } from '@worldwidewebb/client-nfts';
-import { COLLECTION_API, COLLECTION_API_URL } from 'src/app-constants';
+import { COLLECTION_API } from 'src/app-constants';
 import { CollectionApiService } from './collection-api.service';
 
 const collectionApiFactory = {
@@ -11,7 +11,6 @@ const collectionApiFactory = {
 };
 
 @Module({
-  // providers: [CollectionApiService],
   providers: [collectionApiFactory, CollectionApiService],
   exports: [CollectionApiService],
 })
