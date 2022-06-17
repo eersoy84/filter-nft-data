@@ -30,7 +30,6 @@ export class FilterNftService {
     const { userId, ownedCollection, chain } = value;
 
     const filteredCollections: FilteredCollections[] = await this.filterNfts(chain, ownedCollection, null);
-    console.log('filtered collections', filteredCollections.length);
     if (filteredCollections?.length == 0) return;
     Promise.all(
       filteredCollections.map(async (filteredCollection: FilteredCollections) => {
