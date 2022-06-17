@@ -56,7 +56,7 @@ export class OpenseaService {
         },
       };
     } catch (err) {
-      console.warn(`Error while fetching metadata for asset ${address} #${token_id} from OpenSea`, err);
+      // console.warn(`Error while fetching metadata for asset ${address} #${token_id} from OpenSea`, err);
       return null;
     }
 

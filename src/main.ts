@@ -1,23 +1,25 @@
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
+import KafkaCustomerTransporter from './kafka-custom-transporter';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-    transport: Transport.KAFKA,
-    options: {
+  const app = await NestFactory.createMicroservice(AppModule, {
+    strategy: new KafkaCustomerTransporter({
+      subscribe: {
+        fromBeginning: true,
+      },
       client: {
+        clientId: 'filterNftData',
         brokers: [process.env.KAFKA_BROKER_URL],
-        retry: {
-          retries: 8,
-          initialRetryTime: 3000,
-          maxRetryTime: 30000,
-        },
       },
       consumer: {
-        groupId: 'filter.nft.data.consumer',
+        groupId: 'filterNftData-consumer',
+        allowAutoTopicCreation: false,
       },
-    },
+      run: {
+        autoCommit: false,
+      },
+    }),
   });
   await app.listen();
 }

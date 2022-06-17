@@ -2,43 +2,46 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { Collection } from '@worldwidewebb/shared-messages/nfts';
 import { FilterQuery } from 'mongoose';
-import { NftCollection } from 'schema';
 import {
-  FETCH_NFT_DATA_SERVICE,
+  FETCH_NFT_DATA_TOPIC,
   FilteredCollections,
   FilteredCollectionsWithUserId,
   MoralisAvatarAddress,
-  OPENSEA_CONTRACT_ADDRESS,
-} from 'src/app-constants';
+} from 'src/app.constants';
 import { CollectionTokens } from 'src/models/collectionTokens';
 import { OpenseaService } from 'src/opensea/opensea.service';
 import { CollectionApiService } from 'src/collection-api/collection-api.service';
+import { OPENSEA_CONTRACT_ADDRESS } from 'src/utils';
+import { NftCollection } from '@worldwidewebb/client-nfts';
+import { KafkaService } from 'src/kafka/kafka.service';
 
 @Injectable()
 export class FilterNftService {
   private readonly logger = new Logger(FilterNftService.name);
   constructor(
-    @Inject(FETCH_NFT_DATA_SERVICE) private readonly fetchNftClient: ClientKafka,
+    private kafka: KafkaService,
     private readonly openSea: OpenseaService,
     private readonly collectionApi: CollectionApiService,
   ) {
     this.logger.verbose('Initializing 3rd party Apis...');
   }
 
-  async handleFilterNftData(value: MoralisAvatarAddress) {
+  async handleFilterNftData(value: MoralisAvatarAddress, partition: number) {
     const { userId, ownedCollection, chain } = value;
 
     const filteredCollections: FilteredCollections[] = await this.filterNfts(chain, ownedCollection, null);
     console.log('filtered collections', filteredCollections.length);
     if (filteredCollections?.length == 0) return;
-    filteredCollections.map(async (filteredCollection: FilteredCollections) => {
-      let filteredCollectionWithUserId: FilteredCollectionsWithUserId = {
-        userId: userId,
-        filteredCollection,
-      };
-      console.log('Emiting fetch.nft.data.now event', filteredCollectionWithUserId);
-      this.fetchNftClient.emit('fetch.nft.data', filteredCollectionWithUserId);
-    });
+    Promise.all(
+      filteredCollections.map(async (filteredCollection: FilteredCollections) => {
+        let filteredCollectionWithUserId: FilteredCollectionsWithUserId = {
+          userId: userId,
+          filteredCollection,
+        };
+        console.log('Emiting fetch.nft.data event', filteredCollectionWithUserId);
+        await this.kafka.send(FETCH_NFT_DATA_TOPIC, filteredCollectionWithUserId, partition);
+      }),
+    );
   }
   public async filterNfts(
     chain: string,

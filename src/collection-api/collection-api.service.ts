@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { CollectionApi } from '@worldwidewebb/client-nfts';
-import { NftCollection } from 'schema';
-import { COLLECTION_API } from 'src/app-constants';
+import { CollectionApi, NftCollection } from '@worldwidewebb/client-nfts';
+// import { NftCollection } from 'schema';
+import { COLLECTION_API } from 'src/app.constants';
 
 @Injectable()
 export class CollectionApiService {

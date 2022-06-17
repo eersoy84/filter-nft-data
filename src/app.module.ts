@@ -5,7 +5,12 @@ import { AppService } from './app.service';
 import { FilterNftModule } from './filter-nft/filter-nft.module';
 
 @Module({
-  imports: [FilterNftModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    FilterNftModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

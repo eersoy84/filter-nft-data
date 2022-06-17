@@ -1,6 +1,8 @@
 import { CollectionTokens } from './models/collectionTokens';
-import { NftCollection } from 'schema';
 import { Collection, Token } from '@worldwidewebb/shared-messages/nfts';
+import { NftCollection } from '@worldwidewebb/client-nfts';
+import { ConfigModule } from '@nestjs/config';
+ConfigModule.forRoot();
 
 export type MoralisAvatarAddress = {
   userId: string;
@@ -19,7 +21,9 @@ export type FilteredCollectionsWithUserId = {
   userId: string;
   filteredCollection: FilteredCollections;
 };
-
-export const FETCH_NFT_DATA_SERVICE = 'FETCH_NFT_DATA_SERVICE';
-export const OPENSEA_CONTRACT_ADDRESS = '0x495f947276749ce646f68ac8c248420045cb7b5e';
 export const COLLECTION_API = 'COLLECTION_API';
+export const FILTER_NFT_DATA_TOPIC = process.env.FILTER_NFT_DATA_TOPIC || 'filter.nft.data';
+export const FETCH_NFT_DATA_TOPIC = process.env.FETCH_NFT_DATA_TOPIC || 'fetch.nft.data';
+export const FETCH_NFT_DATA_SERVICE = 'FETCH_NFT_DATA_SERVICE';
+export const NUM_PARTITIONS = parseInt(process.env.NUM_PARTITIONS) || 1;
+export const REPLICATION_FACTOR = parseInt(process.env.REPLICATION_FACTOR) || 1;
